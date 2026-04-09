@@ -36,7 +36,10 @@ public class Ticket {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        status = TicketStatus.OPEN;
+        updatedAt = LocalDateTime.now();
+        if (status == null) {
+            status = TicketStatus.OPEN;
+        }
     }
 
     @PreUpdate
