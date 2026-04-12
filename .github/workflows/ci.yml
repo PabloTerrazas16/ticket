@@ -29,7 +29,7 @@ jobs:
         run: ./mvnw clean verify
 
       - name: ✅ Verificar artefactos generados
-        run: ls -la target/*.jar 2>/dev/null || echo "Buscando JARs..." && find target -name "*.jar" -type f
+        run: find target -name "*.jar" -type f
 
       - name: 📊 Resumen del Pipeline
         if: always()
