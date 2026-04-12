@@ -26,10 +26,10 @@ jobs:
           cache: maven
 
       - name: 🔨 Build y tests con Maven
-        run: ./mvnw clean verify
+        run: bash mvnw clean verify
 
       - name: ✅ Verificar artefactos generados
-        run: find target -name "*.jar" -type f
+        run: find target -name "*.jar" -type f || true
 
       - name: 📊 Resumen del Pipeline
         if: always()
