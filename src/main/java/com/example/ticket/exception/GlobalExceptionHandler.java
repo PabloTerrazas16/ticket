@@ -42,3 +42,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(body);
     }
 }
+/*
+**Hola  ! Este es un ejemplo de un controlador de excepciones global en una aplicación Spring Boot. El controlador maneja dos tipos de excepciones: `TicketNotFoundException` y `MethodArgumentNotValidException`.
+*/
