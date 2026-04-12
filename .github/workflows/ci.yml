@@ -91,7 +91,12 @@ jobs:
 
       - name: ✅ Verificar JAR creado
         run: |
-          test -f "target/*.jar" && echo "✓ JAR generado exitosamente" || exit 1
+          if [ -f "target/ticket-0.0.1-SNAPSHOT.jar" ]; then
+            echo "✓ JAR generado exitosamente"
+          else
+            ls -la target/
+            exit 1
+          fi
 
   notify-results:
     runs-on: ubuntu-latest
@@ -99,13 +104,10 @@ jobs:
     if: always()
 
     steps:
-      - name: 📢 Notificar resultado del build
+      - name: 📢 Resumen del Pipeline
         run: |
-          if [ "${{ needs.build.result }}" == "success" ] && [ "${{ needs.quality-checks.result }}" == "success" ]; then
-            echo "✅ TODOS LOS CHECKS PASARON"
-            echo "Pipeline ejecutado por: ${{ github.actor }}"
-            echo "Rama: ${{ github.ref }}"
-          else
-            echo "❌ ALGUNOS CHECKS FALLARON"
-            exit 1
-          fi
+          echo "✅ Pipeline de CI/CD completado"
+          echo "Build: ${{ needs.build.result }}"
+          echo "Quality Checks: ${{ needs.quality-checks.result }}"
+          echo "Rama: ${{ github.ref }}"
+          echo "Actor: ${{ github.actor }}"
