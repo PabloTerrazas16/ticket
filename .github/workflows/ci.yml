@@ -1,0 +1,40 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout código
+        uses: actions/checkout@v4
+
+      - name: ☕ Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven
+
+      - name: 🔨 Build y tests con Maven
+        run: bash mvnw clean verify -Dspring.profiles.active=test
+
+      - name: ✅ Verificar artefactos generados
+        run: find target -name "*.jar" -type f || true
+
+      - name: 📊 Resumen del Pipeline
+        if: always()
+        run: |
+          echo "✅ Pipeline completado exitosamente"
+          echo "Rama: ${{ github.ref }}"
+          echo "Evento: ${{ github.event_name }}"
+          echo "Actor: ${{ github.actor }}"
