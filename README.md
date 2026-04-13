@@ -1,10 +1,3 @@
-# Ticket de Soporte — Microservicio REST
-
-**Proyecto:** Evaluación Parcial N°1 — Ingeniería DevOps (DOY0101)  
-**Repositorio GitHub:** [github.com/PabloTerrazas16/ticket](https://github.com/PabloTerrazas16/ticket)
-
----
-
 ## 📌 Introducción
 
 Este repositorio contiene el **Microservicio de Ticket de Soporte**, una API REST construida con **Spring Boot 3** y **Java 17** que permite registrar y consultar tickets de soporte técnico en tiempo real.
@@ -463,20 +456,6 @@ El workflow `ci.yml` se ejecuta automáticamente en:
   - Tests de integración en ambientes
   - Notificaciones Slack/email
 
----
-
-## 📊 Resumen de Buenas Prácticas Implementadas
-
-| Práctica                           | Implementación                    | Evaluador |
-| ---------------------------------- | --------------------------------- | --------- |
-| **Branching Strategy**             | GitFlow con justificación         | IE1 (15%) |
-| **Trabajo Colaborativo**           | 3 PRs (2 features + 1 hotfix)     | IE2 (15%) |
-| **Automatización DevOps**          | GitHub Actions CI pipeline        | IE3 (25%) |
-| **GitHub Actions Config**          | Workflow completo en ci.yml       | IE4 (25%) |
-| **Documentación/Buenas Prácticas** | README + Convenciones + Checklist | IE5 (20%) |
-
----
-
 ## 📁 Estructura del Repositorio
 
 ```
@@ -561,5 +540,6 @@ Release: v1.1.1
 ---
 
 **Última actualización:** Abril 12, 2026  
-**Integrantes:** Pablo Terrazas + Compañero  
-**Evaluación:** DevOps DOY0101
+**Integrantes:** Pablo Terrazas y Jeremy Pincheira
+
+por fin dejó de dar error en el Actions kjdfhd
