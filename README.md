@@ -20,11 +20,11 @@ Este proyecto demuestra cómo implementar **buenas prácticas DevOps** desde el 
 
 ## 🔧 Requisitos Técnicos
 
-| Componente | Versión |
-|-----------|---------|
-| **Java** | 17 o superior |
-| **Spring Boot** | 3.5.11 |
-| **Maven** | Incluido (mvnw) |
+| Componente        | Versión                          |
+| ----------------- | -------------------------------- |
+| **Java**          | 17 o superior                    |
+| **Spring Boot**   | 3.5.11                           |
+| **Maven**         | Incluido (mvnw)                  |
 | **Base de Datos** | H2 en memoria (desarrollo/tests) |
 
 ---
@@ -41,11 +41,13 @@ cd ticket
 ### 2. Compilar y levantar el servidor
 
 **Windows:**
+
 ```bash
 mvnw.cmd spring-boot:run
 ```
 
 **Linux / Mac:**
+
 ```bash
 ./mvnw spring-boot:run
 ```
@@ -56,11 +58,11 @@ La aplicación arranca en: **http://localhost:8080**
 
 URL: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
 
-| Campo | Valor |
-|-------|-------|
-| JDBC URL | `jdbc:h2:mem:ticketdb` |
-| Usuario | `sa` |
-| Contraseña | *(vacío)* |
+| Campo      | Valor                  |
+| ---------- | ---------------------- |
+| JDBC URL   | `jdbc:h2:mem:ticketdb` |
+| Usuario    | `sa`                   |
+| Contraseña | _(vacío)_              |
 
 ---
 
@@ -73,6 +75,7 @@ URL: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
 Crea un nuevo ticket de soporte con validaciones de campos obligatorios.
 
 **Request:**
+
 ```json
 {
   "title": "Error al iniciar sesión",
@@ -81,6 +84,7 @@ Crea un nuevo ticket de soporte con validaciones de campos obligatorios.
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "id": 1,
@@ -99,11 +103,13 @@ Crea un nuevo ticket de soporte con validaciones de campos obligatorios.
 Obtiene el estado actual de un ticket por su ID.
 
 **Request:**
+
 ```
 GET /api/tickets/1/status
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "id": 1,
@@ -116,6 +122,7 @@ GET /api/tickets/1/status
 ```
 
 **Response (404 Not Found):**
+
 ```json
 {
   "timestamp": "2026-04-12T10:35:00",
@@ -155,12 +162,12 @@ El microservicio sigue una **arquitectura en capas** bien definida:
 
 **Estados del Ticket:**
 
-| Estado | Descripción |
-|--------|-------------|
-| `OPEN` | Recién creado, pendiente de atención |
-| `IN_PROGRESS` | En proceso de resolución |
-| `RESOLVED` | Problema resuelto |
-| `CLOSED` | Cerrado definitivamente |
+| Estado        | Descripción                          |
+| ------------- | ------------------------------------ |
+| `OPEN`        | Recién creado, pendiente de atención |
+| `IN_PROGRESS` | En proceso de resolución             |
+| `RESOLVED`    | Problema resuelto                    |
+| `CLOSED`      | Cerrado definitivamente              |
 
 ---
 
@@ -189,12 +196,12 @@ main (producción) ←── hotfix/fix-ticket-status
   └── Merges mediante Pull Requests aprobados
 ```
 
-| Rama | Propósito | Origen | Merge a |
-|------|-----------|--------|---------|
-| `main` | Código en producción (estable) | - | - |
-| `develop` | Integración continua de features | `main` | `main` (releases) |
-| `feature/*` | Nuevas funcionalidades aisladas | `develop` | `develop` (PR) |
-| `hotfix/*` | Correcciones críticas de producción | `main` | `main` + `develop` |
+| Rama        | Propósito                           | Origen    | Merge a            |
+| ----------- | ----------------------------------- | --------- | ------------------ |
+| `main`      | Código en producción (estable)      | -         | -                  |
+| `develop`   | Integración continua de features    | `main`    | `main` (releases)  |
+| `feature/*` | Nuevas funcionalidades aisladas     | `develop` | `develop` (PR)     |
+| `hotfix/*`  | Correcciones críticas de producción | `main`    | `main` + `develop` |
 
 ---
 
@@ -224,6 +231,7 @@ git push -u origin feature/nombre-descriptivo
 ```
 
 **Ejemplo realizado en este proyecto:**
+
 ```bash
 git checkout -b feature/add-ticket-validations develop
 # Agregué validaciones de longitud mínima y patrones de caracteres
@@ -257,6 +265,7 @@ git push origin --delete hotfix/nombre-bug-critico
 ```
 
 **Ejemplo realizado en este proyecto:**
+
 ```bash
 git checkout -b hotfix/fix-ticket-status main
 # Corregí NullPointerException al consultar ticket inexistente
@@ -273,16 +282,16 @@ El equipo adoptó **Conventional Commits** para todos los commits del repositori
 
 ### Prefijos Estándar
 
-| Prefijo | Tipo | Ejemplo |
-|---------|------|---------|
-| `feat:` | Nueva funcionalidad | `feat: agregar endpoint para listar tickets` |
-| `fix:` | Corrección de bug | `fix: corregir timestamp null en excepción` |
-| `docs:` | Documentación | `docs: actualizar README con GitFlow` |
-| `style:` | Formato de código | `style: formatear imports en TicketController` |
-| `refactor:` | Reorganización de código | `refactor: extraer validación a método` |
-| `test:` | Tests unitarios/integración | `test: agregar tests para validaciones` |
-| `chore:` | Build, dependencias, config | `chore: actualizar pom.xml con H2` |
-| `ci:` | Cambios en GitHub Actions | `ci: ajustar workflow para tests` |
+| Prefijo     | Tipo                        | Ejemplo                                        |
+| ----------- | --------------------------- | ---------------------------------------------- |
+| `feat:`     | Nueva funcionalidad         | `feat: agregar endpoint para listar tickets`   |
+| `fix:`      | Corrección de bug           | `fix: corregir timestamp null en excepción`    |
+| `docs:`     | Documentación               | `docs: actualizar README con GitFlow`          |
+| `style:`    | Formato de código           | `style: formatear imports en TicketController` |
+| `refactor:` | Reorganización de código    | `refactor: extraer validación a método`        |
+| `test:`     | Tests unitarios/integración | `test: agregar tests para validaciones`        |
+| `chore:`    | Build, dependencias, config | `chore: actualizar pom.xml con H2`             |
+| `ci:`       | Cambios en GitHub Actions   | `ci: ajustar workflow para tests`              |
 
 ### Reglas del Equipo
 
@@ -440,11 +449,13 @@ El workflow `ci.yml` se ejecuta automáticamente en:
 ### Rol del Pipeline en DevOps
 
 **CI — Integración Continua:**
+
 - Cada push a `develop` o `main` dispara automáticamente compilación y tests
 - Garantiza que ningún cambio llegue a ramas principales sin validación
 - Si el build falla, GitHub bloquea el merge del PR hasta su corrección
 
 **CD — Entrega Continua (Proyección futura):**
+
 - En fases posteriores del semestre, se puede extender el pipeline con:
   - Build de imagen Docker
   - Push a Docker Registry
@@ -456,12 +467,12 @@ El workflow `ci.yml` se ejecuta automáticamente en:
 
 ## 📊 Resumen de Buenas Prácticas Implementadas
 
-| Práctica | Implementación | Evaluador |
-|----------|-----------------|-----------|
-| **Branching Strategy** | GitFlow con justificación | IE1 (15%) |
-| **Trabajo Colaborativo** | 3 PRs (2 features + 1 hotfix) | IE2 (15%) |
-| **Automatización DevOps** | GitHub Actions CI pipeline | IE3 (25%) |
-| **GitHub Actions Config** | Workflow completo en ci.yml | IE4 (25%) |
+| Práctica                           | Implementación                    | Evaluador |
+| ---------------------------------- | --------------------------------- | --------- |
+| **Branching Strategy**             | GitFlow con justificación         | IE1 (15%) |
+| **Trabajo Colaborativo**           | 3 PRs (2 features + 1 hotfix)     | IE2 (15%) |
+| **Automatización DevOps**          | GitHub Actions CI pipeline        | IE3 (25%) |
+| **GitHub Actions Config**          | Workflow completo en ci.yml       | IE4 (25%) |
 | **Documentación/Buenas Prácticas** | README + Convenciones + Checklist | IE5 (20%) |
 
 ---
@@ -504,6 +515,7 @@ README.md                            Este archivo
 ### Features Implementadas (Equipo)
 
 **Feature 1: Validaciones Mejoradas**
+
 ```
 Rama: feature/add-ticket-validations
 Cambios: Validaciones de longitud mínima y patrones de caracteres
@@ -511,6 +523,7 @@ PR: Merged a develop ✅
 ```
 
 **Feature 2: Validación de Formulario**
+
 ```
 Rama: feature/validacion-formulario
 Cambios: Validación de campos obligatorios en DTO
@@ -518,6 +531,7 @@ PR: Merged a develop ✅
 ```
 
 **Feature 3: Endpoint de Listar Tickets**
+
 ```
 Rama: feature/agregar-endpoint-tickets
 Cambios: GET /api/tickets con filtro por estado
@@ -527,6 +541,7 @@ PR: Merged a develop ✅
 ### Hotfix Realizado (Crítico)
 
 **Hotfix: Corrección NullPointerException**
+
 ```
 Rama: hotfix/corregir-null-pointer
 Cambios: Manejo correcto de excepciones en consultas
