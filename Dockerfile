@@ -1,4 +1,4 @@
-FROM maven:3.9.8-eclipse-temurin-17 AS builder
+FROM maven:3.9.15-eclipse-temurin-26 AS builder
 
 WORKDIR /build
 
