@@ -21,9 +21,11 @@ public class TicketServiceImpl implements TicketService {
     @Override
     @Transactional
     public TicketResponse registerTicket(TicketRequest request) {
+        validateTicketRequest(request);
+        
         Ticket ticket = new Ticket();
-        ticket.setTitle(request.getTitle());
-        ticket.setDescription(request.getDescription());
+        ticket.setTitle(request.getTitle().trim());
+        ticket.setDescription(request.getDescription().trim());
 
         Ticket saved = ticketRepository.save(ticket);
         log.info("Ticket registrado con ID: {}", saved.getId());
@@ -50,5 +52,15 @@ public class TicketServiceImpl implements TicketService {
                 .createdAt(ticket.getCreatedAt())
                 .updatedAt(ticket.getUpdatedAt())
                 .build();
+    }
+
+    private void validateTicketRequest(TicketRequest request) {
+        if (request.getTitle() == null || request.getTitle().trim().isEmpty()) {
+            throw new IllegalArgumentException("El título no puede estar vacío");
+        }
+        if (request.getDescription() == null || request.getDescription().trim().isEmpty()) {
+            throw new IllegalArgumentException("La descripción no puede estar vacía");
+        }
+        log.debug("Validación de ticket completada exitosamente");
     }
 }

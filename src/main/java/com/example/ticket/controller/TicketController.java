@@ -30,3 +30,6 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.getTicketStatus(id));
     }
 }
+/*
+**hola este es un ejemplo de un controlador de tickets en una aplicación Spring Boot. El controlador tiene dos endpoints: uno para registrar un nuevo ticket y otro para obtener el estado de un ticket existente. El método `registerTicket` recibe una solicitud de tipo `TicketRequest`, valida los datos y devuelve una respuesta de tipo `TicketResponse` con el estado del ticket creado. El método `getTicketStatus` recibe un ID de ticket como parámetro y devuelve el estado del ticket correspondiente.
+*/

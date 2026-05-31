@@ -34,6 +34,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor");
+    }
+
     private ResponseEntity<Map<String, Object>> buildError(HttpStatus status, String message) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
@@ -42,3 +52,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(body);
     }
 }
+/*
+**Hola  ! Este es un ejemplo de un controlador de excepciones global en una aplicación Spring Boot. El controlador maneja dos tipos de excepciones: `TicketNotFoundException` y `MethodArgumentNotValidException`.
+*/
