@@ -1,0 +1,83 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ticket-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_NAME:-ticket_db}
+      MYSQL_USER: ${DB_USER:-ticket_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-password}
+    ports:
+      - "${DB_PORT:-3307}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - ticket-network
+    restart: unless-stopped
+
+  ticket-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ticket-app
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-ticket_db}
+      DB_USER: ${DB_USER:-ticket_user}
+      DB_PASSWORD: ${DB_PASSWORD:-password}
+      JAVA_OPTS: "-Xms256m -Xmx512m -XX:+UseG1GC"
+    ports:
+      - "${APP_PORT:-9080}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    networks:
+      - ticket-network
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  phpmyadmin:
+    image: phpmyadmin:latest-alpine
+    container_name: ticket-phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: ${DB_USER:-ticket_user}
+      PMA_PASSWORD: ${DB_PASSWORD:-password}
+      PMA_PORT: 3306
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
+    networks:
+      - ticket-network
+    restart: unless-stopped
+    profiles:
+      - debug
+#holaa
+volumes:
+  mysql_data:
+    driver: local
+  logs:
+    driver: local
+
+networks:
+  ticket-network:
+    driver: bridge
