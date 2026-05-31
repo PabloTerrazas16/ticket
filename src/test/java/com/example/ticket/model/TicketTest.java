@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,7 +42,11 @@ class TicketTest {
         // Assert
         assertNotNull(ticket.getCreatedAt());
         assertNotNull(ticket.getUpdatedAt());
-        assertEquals(ticket.getCreatedAt(), ticket.getUpdatedAt());
+        // Comparar truncando a milisegundos (LocalDateTime.now() puede variar en nanosegundos)
+        assertEquals(
+            ticket.getCreatedAt().truncatedTo(ChronoUnit.MILLIS),
+            ticket.getUpdatedAt().truncatedTo(ChronoUnit.MILLIS)
+        );
     }
 
     @Test

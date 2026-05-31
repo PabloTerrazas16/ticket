@@ -1,0 +1,17 @@
+**/node_modules
+**/.git
+**/.gitignore
+**/.dockerignore
+**/target
+**/.idea
+**/.vscode
+**/.DS_Store
+**/Thumbs.db
+**/npm-debug.log
+**/*.log
+**/coverage
+**/.m2
+**/.gradle
+**/build
+**/dist
+**/out
