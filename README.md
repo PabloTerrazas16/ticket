@@ -7,7 +7,7 @@
 | Nombre             | GitHub                                                 |
 | ------------------ | ------------------------------------------------------ |
 | Pablo Terrazas     | [@PabloTerrazas16](https://github.com/PabloTerrazas16) |
-| (Jeremy Pincheira) | [@JereMago](https://github.com/JereMago)               |
+| Jeremy Pincheira | [@JereMago](https://github.com/JereMago)               |
 
 ---
 
