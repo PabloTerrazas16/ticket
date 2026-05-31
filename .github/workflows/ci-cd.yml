@@ -44,26 +44,6 @@ jobs:
           name: jacoco-coverage-report
           path: target/site/jacoco/
 
-      - name: "Comentar cobertura en PR"
-        uses: actions/github-script@v7
-        if: github.event_name == 'pull_request'
-        with:
-          script: |
-            const fs = require('fs');
-            const indexPath = 'target/site/jacoco/index.html';
-            if (fs.existsSync(indexPath)) {
-              const content = fs.readFileSync(indexPath, 'utf8');
-              const coverageMatch = content.match(/(\d+\.?\d*)%/);
-              if (coverageMatch) {
-                github.rest.issues.createComment({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  body: `**Cobertura de código (JaCoCo):** ${coverageMatch[0]}\n\n[Ver reporte completo](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`
-                });
-              }
-            }
-
   security:
     name: "Análisis de Seguridad (Snyk)"
     runs-on: ubuntu-latest
