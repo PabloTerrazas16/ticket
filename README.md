@@ -1,4 +1,4 @@
-# 🎟️ Ticket Service — Pipeline CI/CD & Observabilidad
+# Ticket Service — Pipeline CI/CD & Observabilidad
 
 ---
 
@@ -149,7 +149,7 @@ Las pruebas se ejecutan automáticamente en cada push y Pull Request mediante el
 ./mvnw test -Dspring.profiles.active=test
 ```
 
-### ❌ Validación de Pruebas Unitarias (Fallas en CI)
+###  Validación de Pruebas Unitarias (Fallas en CI)
 <img width="1441" height="612" alt="4" src="https://github.com/user-attachments/assets/00a0c29c-af84-45c2-80ee-8100ae0b573c" />
 <img width="1408" height="763" alt="3" src="https://github.com/user-attachments/assets/bb916da6-ca68-43f1-8430-9176a26521a0" />
 ![Uploading 10.png…]()
@@ -181,7 +181,9 @@ El código fuente es evaluado bajo los estándares de SonarQube Cloud para preve
 
 ### Restricciones de Seguridad de la Organización (Políticas de PR)
 
-> ⚠️ **Nota de cumplimiento:** Por motivos de políticas estrictas de seguridad de datos de la organización, las peticiones Pull Request o ramas de desarrollo temporales que apunten a entornos secundarios cuentan con directivas nativas de restricción de lectura de datos cruzados para mitigar la fuga de información de la estructura del repositorio.
+>  **Nota de cumplimiento:** Por motivos de políticas estrictas de seguridad de datos de la organización, las peticiones Pull Request o ramas de desarrollo temporales que apunten a entornos secundarios cuentan con directivas nativas de restricción de lectura de datos cruzados para mitigar la fuga de información de la estructura del repositorio.
+<img width="1848" height="890" alt="11" src="https://github.com/user-attachments/assets/3031bfdc-5823-478a-be9d-a96ab84dad1b" />
+
 
 ### 🔍 Capas de Escaneo Adicionales en el Pipeline
 
@@ -214,7 +216,7 @@ Revisa semanalmente (lunes) tres ecosistemas del repositorio:
 
 ---
 
-## 🚀 Escalabilidad y Despliegue en Kubernetes
+## Escalabilidad y Despliegue en Kubernetes
 
 ### Escalabilidad Automática
 
@@ -233,7 +235,7 @@ El archivo `k8s/hpa.yml` (HorizontalPodAutoscaler) escala automáticamente entre
 
 ---
 
-## 📋 Trazabilidad del Despliegue
+## Trazabilidad del Despliegue
 
 Cada ejecución del pipeline genera un bloque de metadatos auditable dentro de los logs del flujo para asegurar el rastreo de extremo a extremo:
 
@@ -261,7 +263,7 @@ Para el correcto funcionamiento de este flujo automatizado, se deben registrar l
 
 ---
 
-## 🗺️ Estrategia de Branching
+## Estrategia de Branching
 
 Se utilizó rigurosamente **GitHub Flow:**
 
@@ -272,3 +274,14 @@ Se utilizó rigurosamente **GitHub Flow:**
 - **`dependabot/*`:** Ramas creadas automáticamente por el ecosistema de seguridad de GitHub para mantener actualizadas las dependencias críticas de Maven y Docker de forma segura.
 
 Cada nueva característica técnica o corrección de bugs fue integrada mediante **Pull Requests (PR)**, asegurando la revisión de código por pares y la ejecución obligatoria del pipeline antes del merge.
+
+
+
+## Reflexión Final y Conclusión
+Pablo Terrazas: Bueno... durante todo el proceso de las 3 entregas, mi foco principal estuvo orientado a la construcción, automatización y blindaje del pipeline del CI/CD, así como a la resolución de fallas complejas durante la etapa de compilación en GitHub Actions (rabié mucho con esto, jaja). Logré entender que herramientas como Snyk, Trivy y SonarQube Cloud no solo analicen el código, sino que actúen como "compuertas de calidad" estrictas, y vaya que cambió por completo mi perspectiva sobre el desarrollo de software.
+En su momento pensé que sólo era código, pero poco a poco comprendí que era necesario aprender estas herramientas, y sobretodo tener buenas prácticas en el desarrollo de software, tales como la estrategia de Branching que, aunque no la entendía al principio, supe que era algo necesario y hasta da gusto (y algo de pereza también... jeje) crear nuevas ramas y luego mergearlas a la rama develop, que en mi caso, fue donde mergeaba todo.
+Aprendí que el concepto de Fail-Fast no era solo una frase teórica, porque cuando un test falla en el controlador o el escáner detecta un problema de seguridad crítico, el pipeline protege el entorno productivo de forma autónoma. Muchas veces me quedé hasta tarde intentando solucionar un problema con el pipeline cuando la mayoria de veces era un problema de identación en los YML... o incluso un conflicto de versiones... y tuve que volver a poner "docker compose down" y "docker compose up" un montón de veces, pero en fin. Fue una experiencia compleja y todo esto es muy necesario para el desarrollo de software.
+
+
+
+
