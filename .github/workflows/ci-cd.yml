@@ -146,7 +146,7 @@ jobs:
       - name: Escaneo de imagen con Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
+          image-ref: 'ghcr.io/pabloterrazas16/ticket/ticket-service:latest'
           format: "sarif"
           output: "trivy-results.sarif"
           severity: "CRITICAL,HIGH"
