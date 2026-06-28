@@ -22,13 +22,13 @@ class TicketTest {
     @Test
     @DisplayName("Crear ticket con valores iniciales")
     void testCreateTicket() {
-        // Act
         ticket.setTitle("Error en login");
         ticket.setDescription("No puedo acceder a mi cuenta");
 
-        // Assert
-        assertEquals("Error en login", ticket.getTitle());
+
+        assertEquals("Error en login", ticket.getTitle()); 
         assertEquals("No puedo acceder a mi cuenta", ticket.getDescription());
+
     }
 
     @Test
@@ -116,4 +116,5 @@ class TicketTest {
         // Assert
         assertEquals(1L, ticket.getId());
     }
+
 }
