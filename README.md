@@ -1,13 +1,13 @@
-# Ticket Service — Pipeline CI/CD
+# 🎟️ Ticket Service — Pipeline CI/CD & Observabilidad
 
 ---
 
 ## Integrantes
 
-| Nombre             | GitHub                                                 |
-| ------------------ | ------------------------------------------------------ |
-| Pablo Terrazas     | [@PabloTerrazas16](https://github.com/PabloTerrazas16) |
-| Jeremy Pincheira | [@JereMago](https://github.com/JereMago)               |
+| Nombre           | GitHub                                                  |
+| ---------------- | ------------------------------------------------------- |
+| Pablo Terrazas   | [@PabloTerrazas16](https://github.com/PabloTerrazas16) |
+| Jeremy Pincheira | [@JereMago](https://github.com/JereMago)                |
 
 ---
 
@@ -15,12 +15,12 @@
 
 API REST desarrollada en **Spring Boot 3.5 + Java 17** para la gestión de tickets de soporte. Expone dos endpoints principales:
 
-| Método | Endpoint                   | Descripción                      |
-| ------ | -------------------------- | -------------------------------- |
-| `POST` | `/api/tickets`             | Registrar un nuevo ticket        |
-| `GET`  | `/api/tickets/{id}/status` | Consultar el estado de un ticket |
+| Método | Endpoint                    | Descripción                      |
+| ------ | --------------------------- | -------------------------------- |
+| `POST` | `/api/tickets`              | Registrar un nuevo ticket        |
+| `GET`  | `/api/tickets/{id}/status`  | Consultar el estado de un ticket |
 
-**Stack tecnológico:** Spring Boot · Spring Data JPA · MySQL 8 · H2 (tests) · Lombok · JaCoCo
+**Stack tecnológico:** Spring Boot · Spring Data JPA · MySQL 8 · H2 (tests) · Lombok · JaCoCo · SonarQube Cloud · Prometheus · Grafana
 
 ---
 
@@ -30,7 +30,7 @@ API REST desarrollada en **Spring Boot 3.5 + Java 17** para la gestión de ticke
 ticket/
 ├── .github/
 │   ├── workflows/
-│   │   └── ci-cd.yml          # Pipeline GitHub Actions
+│   │   └── ci-cd.yml          # Pipeline GitHub Actions (CI/CD + SonarQube + Trivy)
 │   └── dependabot.yml         # Escaneo automático de dependencias
 ├── k8s/
 │   ├── deployment.yml         # Deployment con 2 réplicas y RollingUpdate
@@ -47,7 +47,7 @@ ticket/
 │       ├── java/com/example/ticket/
 │       └── resources/application-test.properties
 ├── Dockerfile                 # Multi-stage build
-├── docker-compose.yml         # Orquestación local (staging)
+├── docker-compose.yml         # Orquestación local (Staging, Métricas y Grafana)
 └── pom.xml
 ```
 
@@ -59,20 +59,19 @@ El microservicio está contenerizado usando un **Dockerfile multi-stage** que se
 
 ```
 Etapa 1 (builder): maven:3.9.8-eclipse-temurin-17
-  └── Compila el proyecto con Maven
+└── Compila el proyecto con Maven
 
 Etapa 2 (runtime): eclipse-temurin:17-jre-alpine
-  └── Solo contiene el JAR compilado
-  └── Usuario no-root (ticket:ticket)
-  └── HEALTHCHECK integrado
+└── Solo contiene el JAR compilado
+└── Usuario no-root (ticket:ticket)
+└── HEALTHCHECK integrado
 ```
 
 **Características de seguridad del contenedor:**
-
-- Imagen base mínima Alpine (menor superficie de ataque)
-- Usuario no-root (`runAsUser: 1001`)
-- Sin escalación de privilegios
-- Límites de memoria: 256Mi request / 512Mi limit
+- Imagen base mínima Alpine (menor superficie de ataque).
+- Usuario no-root (`runAsUser: 1001`).
+- Sin escalación de privilegios.
+- Límites de memoria: 256Mi request / 512Mi limit.
 
 **Construir y correr la imagen localmente:**
 
@@ -83,20 +82,59 @@ docker run -p 8080:8080 ticket-service
 
 ---
 
-## Pruebas Automatizadas
+## Orquestación de Contenedores (Docker Compose)
 
-Las pruebas se ejecutan automáticamente en cada push y Pull Request mediante el job `test` del pipeline. Se usa **H2 en memoria** para el perfil de test, sin necesidad de MySQL.
+Para el ambiente de staging local y la infraestructura de telemetría, se utiliza Docker Compose para levantar la pila completa de servicios interconectados en una red aislada.
+
+```bash
+docker compose up -d
+```
+
+**Servicios activos en la pila:**
+
+| Servicio            | Imagen                  | Puerto      | Descripción                                              |
+| ------------------- | ----------------------- | ----------- | -------------------------------------------------------- |
+| mysql               | mysql:8.0               | 3307:3306   | Base de datos relacional principal.                      |
+| app (ticket-service)| Build local             | 9080:8080   | Microservicio Spring Boot expuesto.                      |
+| prometheus-ticket   | prom/prometheus:latest  | 9090:9090   | Servidor de scraping de métricas del Actuator.           |
+| grafana-ticket      | grafana/grafana:latest  | 3000:3000   | Panel visual de analíticas y dashboards.                 |
+
+> **Nota de arquitectura:** Todos los servicios se encuentran sincronizados y respondiendo saludablemente (Up), garantizando que la recolección de métricas no pierda continuidad.
+
+---
+
+## 📊 Observabilidad y Monitoreo (Prometheus & Grafana)
+
+Implementamos una solución de monitoreo en tiempo real recolectando las métricas nativas expuestas por Spring Boot Actuator y normalizadas mediante Micrometer.
+
+### 📡 Indexación de Prometheus en Grafana
+
+La comunicación entre componentes se realiza de forma interna. Prometheus está configurado como el origen de datos (Data Source) principal por defecto dentro de la interfaz de Grafana.
+
+### 📈 Panel de Disponibilidad (Uptime Panel)
+
+Monitoreo continuo utilizando expresiones PromQL (`up`) para verificar de forma constante que las instancias de infraestructura responden con estados de activación normales.
+
+### ☕ Métricas de la Máquina Virtual de Java (JVM Core)
+
+Visualización avanzada mediante un Dashboard dedicado que permite inspeccionar la asignación dinámica de memoria Heap y Non-Heap, el comportamiento de los hilos de ejecución y las pausas del Garbage Collector bajo cargas transaccionales.
+
+---
+
+## 🧪 Pruebas Automatizadas e Integración Continua
+
+Las pruebas se ejecutan automáticamente en cada push y Pull Request mediante el pipeline de GitHub Actions. Se usa H2 en memoria para el perfil de test, garantizando el aislamiento de la base de datos MySQL de producción.
 
 **Cobertura de pruebas (JUnit 5 + JaCoCo):**
 
-| Suite                    | Tests  | Descripción                    |
-| ------------------------ | ------ | ------------------------------ |
-| `TicketRepositoryTest`   | 9      | CRUD, búsquedas, conteo con H2 |
-| `TicketServiceImplTest`  | 8      | Lógica de negocio con mocks    |
-| `TicketControllerTest`   | 9      | Endpoints HTTP con MockMvc     |
-| `TicketTest`             | 7      | Validaciones del modelo        |
-| `TicketApplicationTests` | 1      | Carga del contexto Spring      |
-| **Total**                | **34** |                                |
+| Suite                   | Tests | Descripción                               |
+| ----------------------- | ----- | ----------------------------------------- |
+| TicketRepositoryTest    | 9     | CRUD, búsquedas, conteo con H2            |
+| TicketServiceImplTest   | 8     | Lógica de negocio con mocks               |
+| TicketControllerTest    | 9     | Endpoints HTTP con MockMvc                |
+| TicketTest              | 7     | Validaciones del modelo                   |
+| TicketApplicationTests  | 1     | Carga del contexto Spring                 |
+| **Total**               | **34**|                                           |
 
 **Ejecutar pruebas localmente:**
 
@@ -104,183 +142,116 @@ Las pruebas se ejecutan automáticamente en cada push y Pull Request mediante el
 ./mvnw test -Dspring.profiles.active=test
 ```
 
-Los resultados se publican como artefacto en GitHub Actions (`test-results/`) para revisión posterior.
+### ❌ Validación de Pruebas Unitarias (Fallas en CI)
+
+El pipeline cuenta con un mecanismo de protección que detiene el flujo de construcción inmediatamente si algún test de arquitectura o de negocio falla, notificando el error exacto en la terminal.
+
+En este escenario de prueba, el pipeline bloqueó de forma correcta el flujo debido a una aserción errónea controlada en `TicketController`.
+
+### 🟢 Quality Gate Exitoso (Pipeline en Verde)
+
+Una vez resueltos los conflictos de código y pruebas, los flujos automatizados de GitHub Actions y los umbrales de calidad se marcan en verde, autorizando el empaquetado seguro.
 
 ---
 
-## Seguridad y Escalabilidad
+## 🛡️ Seguridad y Calidad de Código (Análisis Estático)
 
-### Análisis de seguridad en el pipeline
+### 📊 Análisis con SonarQube Cloud
 
-El pipeline implementa dos capas de escaneo que **bloquean el despliegue** si detectan vulnerabilidades:
+El código fuente es evaluado bajo los estándares de SonarQube Cloud para prevenir vulnerabilidades prematuras, bugs y mitigar la deuda técnica (Code Smells).
+
+**Panel de Control del Proyecto (Quality Gate Aprobado):** el proyecto cuenta con calificaciones máximas (Clase A) en todos los vectores críticos de desarrollo seguro y un 0% de duplicación.
+
+### Restricciones de Seguridad de la Organización (Políticas de PR)
+
+> ⚠️ **Nota de cumplimiento:** Por motivos de políticas estrictas de seguridad de datos de la organización, las peticiones Pull Request o ramas de desarrollo temporales que apunten a entornos secundarios cuentan con directivas nativas de restricción de lectura de datos cruzados para mitigar la fuga de información de la estructura del repositorio.
+
+### 🔍 Capas de Escaneo Adicionales en el Pipeline
+
+El flujo automatizado implementa dos capas extra que bloquean el despliegue si detectan fallas críticas:
 
 **1. Snyk — Escaneo de dependencias Maven**
 
 ```yaml
 snyk test --severity-threshold=high --all-projects
-# continue-on-error: false → bloquea el pipeline si encuentra HIGH o CRITICAL
+# continue-on-error: false → bloquea el pipeline si encuentra vulnerabilidades HIGH o CRITICAL
 ```
 
-**2. Trivy — Escaneo de imagen Docker**
+**2. Trivy — Escaneo de la imagen Docker**
 
 ```yaml
-# Escanea la imagen construida antes de publicarla
-severity: CRITICAL,HIGH
-exit-code: 1 # bloquea si encuentra vulnerabilidades
+uses: aquasecurity/trivy-action@master
+with:
+  image-ref: 'ghcr.io/pabloterrazas16/ticket/ticket-service:latest'
+  severity: CRITICAL,HIGH
+  exit-code: 1 # Bloquea si encuentra vulnerabilidades críticas en el runtime Alpine
 ```
 
 **3. Dependabot — Actualizaciones automáticas**
 
-Configurado para revisar semanalmente (lunes) tres ecosistemas:
+Revisa semanalmente (lunes) tres ecosistemas del repositorio:
 
-| Ecosistema                | Hora  | PRs máx |
-| ------------------------- | ----- | ------- |
-| Maven (dependencias Java) | 02:00 | 5       |
-| GitHub Actions            | 02:30 | 3       |
-| Docker                    | 03:00 | 2       |
-
-### Escalabilidad en Kubernetes
-
-El HPA escala automáticamente entre 2 y 5 réplicas según métricas de uso:
-
-```yaml
-minReplicas: 2
-maxReplicas: 5
-cpu: target 70% de utilización
-memory: target 80% de utilización
-```
+- **Maven:** Dependencias de Java (Máx. 5 PRs).
+- **GitHub Actions:** Versiones de los componentes del pipeline (Máx. 3 PRs).
+- **Docker:** Versión de las imágenes base del multi-stage (Máx. 2 PRs).
 
 ---
 
-## Despliegue Automático y Trazabilidad
+## 🚀 Escalabilidad y Despliegue en Kubernetes
 
-### Pipeline completo (GitHub Actions)
+### Escalabilidad Automática
 
-El pipeline se ejecuta en cada push a `main` o `develop` y en cada Pull Request a `main`. Los jobs se ejecutan en secuencia con dependencias explícitas:
+El archivo `k8s/hpa.yml` (HorizontalPodAutoscaler) escala automáticamente entre 2 y 5 réplicas según las métricas de uso de los Pods:
 
-```
-test → security → build → deploy
-```
+- `minReplicas: 2`
+- `maxReplicas: 5`
+- **Métricas Objetivo:** Target del 70% de utilización de CPU y 80% de utilización de Memoria.
 
-| Job        | Qué hace                                                                    |
-| ---------- | --------------------------------------------------------------------------- |
-| `test`     | Ejecuta 34 pruebas JUnit con perfil H2                                      |
-| `security` | Snyk sobre pom.xml, bloquea si hay vulnerabilidades HIGH                    |
-| `build`    | Empaqueta con Maven, construye imagen Docker, push a GHCR, Trivy scan       |
-| `deploy`   | Docker Compose staging, validación de health, kubectl dry-run, trazabilidad |
+### Características de la Configuración K8s (Producción)
 
-### Trazabilidad del despliegue
+- **Alta disponibilidad:** Mínimo 2 réplicas obligatorias distribuidas.
+- **RollingUpdate:** Despliegues con `maxUnavailable: 0` garantizando zero-downtime.
+- **Readiness y Liveness probes:** Monitoreo de salud para reinicios automatizados de pods corruptos.
+- **Seguridad de credenciales:** Uso nativo de objetos `Secret` para aislar las variables de entorno de la base de datos.
 
-Cada ejecución del pipeline imprime un resumen de trazabilidad completo:
+---
+
+## 📋 Trazabilidad del Despliegue
+
+Cada ejecución del pipeline genera un bloque de metadatos auditable dentro de los logs del flujo para asegurar el rastreo de extremo a extremo:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔍 Trazabilidad del despliegue
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Commit SHA   : abc1234...
-Branch       : main
-Autor        : PabloTerrazas16, JereMago
-Timestamp    : 2025-06-01T12:00:00Z
-Workflow Run : 123456789
+Commit SHA    : 47b0dbb665f67773b6846882be41c3adda6eb790
+Branch        : main
+Autor         : PabloTerrazas16, JereMago
+Timestamp     : 2026-06-28T09:15:17Z
+Workflow Run  : 123456789
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-Esto garantiza que cada despliegue pueda rastrearse desde el commit original hasta la imagen publicada en GHCR.
+### Configuración de Secrets necesarios en GitHub
 
-### Configuración de secrets necesarios
+Para el correcto funcionamiento de este flujo automatizado, se deben registrar las siguientes variables en **Settings → Secrets and variables → Actions:**
 
-Para ejecutar el pipeline es necesario configurar los siguientes secrets en GitHub (Settings → Secrets → Actions):
-
-| Secret         | Descripción                             | Cómo obtenerlo                                        |
-| -------------- | --------------------------------------- | ----------------------------------------------------- |
-| `SNYK_TOKEN`   | Token de autenticación Snyk             | [app.snyk.io](https://app.snyk.io) → Account Settings |
-| `GITHUB_TOKEN` | Automático, provisto por GitHub Actions | No requiere configuración                             |
-
----
-
-## Orquestación de Contenedores
-
-### Docker Compose (staging local)
-
-Levanta el entorno completo con un solo comando:
-
-```bash
-docker compose up -d
-```
-
-**Servicios:**
-
-| Servicio         | Imagen                   | Puerto    | Descripción                    |
-| ---------------- | ------------------------ | --------- | ------------------------------ |
-| `mysql`          | mysql:8.0                | 3307:3306 | Base de datos principal        |
-| `ticket-service` | build local              | 9080:8080 | Microservicio                  |
-| `phpmyadmin`     | phpmyadmin:latest-alpine | 8081:80   | Admin DB (solo perfil `debug`) |
-
-**Verificar que el servicio está saludable:**
-
-```bash
-curl http://localhost:9080/api/actuator/health
-```
-
-**Detener el entorno:**
-
-```bash
-docker compose down
-```
-
-### Kubernetes (producción)
-
-La carpeta `k8s/` contiene los manifiestos para desplegar en cualquier cluster Kubernetes:
-
-```bash
-# Aplicar todos los manifiestos
-kubectl apply -f k8s/
-
-# Verificar el estado
-kubectl get pods
-kubectl get hpa
-```
-
-**Características de la configuración K8s:**
-
-- **2 réplicas mínimas** para alta disponibilidad
-- **RollingUpdate** con `maxUnavailable: 0` — zero-downtime deployment
-- **topologySpreadConstraints** — distribuye pods en distintos nodos
-- **Readiness y Liveness probes** — Kubernetes reinicia pods no saludables automáticamente
-- **Secrets** — credenciales de BD no expuestas en el Deployment
-- **Resource limits** — evita que un pod consuma recursos de otros
+| Secret         | Descripción                               | Origen / Cómo obtenerlo                              |
+| -------------- | ----------------------------------------- | ---------------------------------------------------- |
+| `SNYK_TOKEN`   | Token de autenticación de Snyk            | app.snyk.io → Account Settings                       |
+| `SONAR_TOKEN`  | Token de vinculación con SonarCloud       | Generado en el perfil de SonarQube Cloud             |
+| `GITHUB_TOKEN` | Token provisto nativamente por GitHub     | Autogenerado por el sistema, no requiere configuración manual |
 
 ---
 
-## Cómo ejecutar el proyecto localmente
+## 🗺️ Estrategia de Branching
 
-**Prerrequisitos:** Docker Desktop, Java 17, Maven
+Se utilizó rigurosamente **GitHub Flow:**
 
-```bash
-# 1. Clonar el repositorio
-git clone https://github.com/PabloTerrazas16/ticket.git
-cd ticket
+- **`main`:** Rama protegida, siempre en estado estable y con pipeline en verde. Representa el código en producción.
+- **`feature/*`:** Ramas independientes y temporales abiertas por cada componente o integración desarrollada.
+- **`develop/*`:** Entorno de integración donde convergen las nuevas características antes del despliegue final.
+- **`feature/add-prometheus-monitoring y feature/observability*`:** Ramas dedicadas exclusivamente al diseño, pruebas y estabilización del stack de telemetría (Prometheus/Grafana).
+- **`dependabot/*`:** Ramas creadas automáticamente por el ecosistema de seguridad de GitHub para mantener actualizadas las dependencias críticas de Maven y Docker de forma segura.
 
-# 2. Levantar con Docker Compose
-docker compose up -d
-
-# 3. Verificar salud del servicio
-curl http://localhost:9080/api/actuator/health
-
-# 4. Crear un ticket de prueba
-curl -X POST http://localhost:9080/api/tickets \
-  -H "Content-Type: application/json" \
-  -d '{"title": "Error en login", "description": "No puedo acceder", "status": "OPEN"}'
-
-# 5. Consultar estado del ticket
-curl http://localhost:9080/api/tickets/1/status
-```
-
-## Estrategia de Branching
-
-Se utilizó **GitHub Flow**:
-
-- `main` — rama protegida, siempre estable y con pipeline en verde
-- `feature/*` — una rama por cada componente desarrollado
-
-Cada feature fue integrada mediante **Pull Request**, lo que permite ver el historial completo de trazabilidad del desarrollo en GitHub.
+Cada nueva característica técnica o corrección de bugs fue integrada mediante **Pull Requests (PR)**, asegurando la revisión de código por pares y la ejecución obligatoria del pipeline antes del merge.
