@@ -26,7 +26,7 @@ class TicketTest {
         ticket.setDescription("No puedo acceder a mi cuenta");
 
 
-        assertEquals("FALLO INTENCIONAL nose 123 AAAAAA", ticket.getTitle()); 
+        assertEquals("FALLOo INTENCIONAL nose 1233456667544 AAAAAA", ticket.getTitle()); 
         assertEquals("No puedo acceder a mi cuenta", ticket.getDescription());
 
     @Test
