@@ -102,20 +102,27 @@ docker compose up -d
 > **Nota de arquitectura:** Todos los servicios se encuentran sincronizados y respondiendo saludablemente (Up), garantizando que la recolección de métricas no pierda continuidad.
 
 ---
+<img width="1044" height="248" alt="6" src="https://github.com/user-attachments/assets/034b5e12-0b7c-4b74-bbfa-17c3fadcb574" />
+<img width="1916" height="1033" alt="5" src="https://github.com/user-attachments/assets/f67b172a-7345-47c5-a4fe-e8eba7775e41" />
+
 
 ## 📊 Observabilidad y Monitoreo (Prometheus & Grafana)
 
 Implementamos una solución de monitoreo en tiempo real recolectando las métricas nativas expuestas por Spring Boot Actuator y normalizadas mediante Micrometer.
 
 ### 📡 Indexación de Prometheus en Grafana
+<img width="1867" height="994" alt="7" src="https://github.com/user-attachments/assets/58856074-1494-448f-a773-41cae4bd6ebe" />
 
 La comunicación entre componentes se realiza de forma interna. Prometheus está configurado como el origen de datos (Data Source) principal por defecto dentro de la interfaz de Grafana.
 
 ### 📈 Panel de Disponibilidad (Uptime Panel)
+<img width="1865" height="905" alt="9" src="https://github.com/user-attachments/assets/fb416eda-d913-4ddd-99a8-9e500697f407" />
+<img width="1861" height="907" alt="8" src="https://github.com/user-attachments/assets/aedff441-b559-40ed-a337-f3c7e66f8672" />
 
 Monitoreo continuo utilizando expresiones PromQL (`up`) para verificar de forma constante que las instancias de infraestructura responden con estados de activación normales.
 
 ### ☕ Métricas de la Máquina Virtual de Java (JVM Core)
+<img width="1375" height="721" alt="10" src="https://github.com/user-attachments/assets/7aaa2a7c-eb42-4bf5-84fd-338532228b5e" />
 
 Visualización avanzada mediante un Dashboard dedicado que permite inspeccionar la asignación dinámica de memoria Heap y Non-Heap, el comportamiento de los hilos de ejecución y las pausas del Garbage Collector bajo cargas transaccionales.
 
@@ -143,12 +150,19 @@ Las pruebas se ejecutan automáticamente en cada push y Pull Request mediante el
 ```
 
 ### ❌ Validación de Pruebas Unitarias (Fallas en CI)
+<img width="1441" height="612" alt="4" src="https://github.com/user-attachments/assets/00a0c29c-af84-45c2-80ee-8100ae0b573c" />
+<img width="1408" height="763" alt="3" src="https://github.com/user-attachments/assets/bb916da6-ca68-43f1-8430-9176a26521a0" />
+![Uploading 10.png…]()
+
 
 El pipeline cuenta con un mecanismo de protección que detiene el flujo de construcción inmediatamente si algún test de arquitectura o de negocio falla, notificando el error exacto en la terminal.
 
 En este escenario de prueba, el pipeline bloqueó de forma correcta el flujo debido a una aserción errónea controlada en `TicketController`.
 
 ### 🟢 Quality Gate Exitoso (Pipeline en Verde)
+<img width="716" height="175" alt="2" src="https://github.com/user-attachments/assets/83b6b062-4674-4538-b61c-701586ac8bfb" />
+
+
 
 Una vez resueltos los conflictos de código y pruebas, los flujos automatizados de GitHub Actions y los umbrales de calidad se marcan en verde, autorizando el empaquetado seguro.
 
@@ -161,6 +175,9 @@ Una vez resueltos los conflictos de código y pruebas, los flujos automatizados 
 El código fuente es evaluado bajo los estándares de SonarQube Cloud para prevenir vulnerabilidades prematuras, bugs y mitigar la deuda técnica (Code Smells).
 
 **Panel de Control del Proyecto (Quality Gate Aprobado):** el proyecto cuenta con calificaciones máximas (Clase A) en todos los vectores críticos de desarrollo seguro y un 0% de duplicación.
+![Uploading 3.png…]()
+
+<img width="1872" height="903" alt="1" src="https://github.com/user-attachments/assets/814b646c-3de2-4c2f-a9dd-63d3afb4d6bc" />
 
 ### Restricciones de Seguridad de la Organización (Políticas de PR)
 
