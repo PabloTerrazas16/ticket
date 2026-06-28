@@ -76,10 +76,9 @@ jobs:
         run: npm install -g snyk
 
       - name: Escaneo de dependencias con Snyk
-        continue-on-error: false
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: snyk test --severity-threshold=high --all-projects
+        run: snyk test --severity-threshold=high --all-projects --json-file-output=snyk.json
 
       - name: Monitorear proyecto en Snyk
         env:
@@ -148,13 +147,14 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
-          format: "all"
+          format: "sarif"
+          output: "trivy-results.sarif"
           severity: "CRITICAL,HIGH"
           exit-code: "0"
 
       - name: Publicar resultados Trivy en GitHub Security
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: success()
         with:
           sarif_file: "trivy-results.sarif"
 
