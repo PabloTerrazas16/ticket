@@ -29,6 +29,8 @@ class TicketTest {
         assertEquals("FALLOo INTENCIONAL nose 1233456667544 AAAAAA", ticket.getTitle()); 
         assertEquals("No puedo acceder a mi cuenta", ticket.getDescription());
 
+    }
+
     @Test
     @DisplayName("Validar que createdAt se asigna en onCreate()")
     void testOnCreateAssignsTimestamps() {
@@ -114,4 +116,5 @@ class TicketTest {
         // Assert
         assertEquals(1L, ticket.getId());
     }
+
 }
