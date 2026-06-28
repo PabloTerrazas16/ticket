@@ -22,14 +22,12 @@ class TicketTest {
     @Test
     @DisplayName("Crear ticket con valores iniciales")
     void testCreateTicket() {
-        // Act
         ticket.setTitle("Error en login");
         ticket.setDescription("No puedo acceder a mi cuenta");
 
-        // Assert
-        assertEquals("Error en login", ticket.getTitle());
+
+        assertEquals("FALLO INTENCIONAL", ticket.getTitle()); 
         assertEquals("No puedo acceder a mi cuenta", ticket.getDescription());
-    }
 
     @Test
     @DisplayName("Validar que createdAt se asigna en onCreate()")
