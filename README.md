@@ -282,6 +282,8 @@ Pablo Terrazas: Bueno... durante todo el proceso de las 3 entregas, mi foco prin
 En su momento pensé que sólo era código, pero poco a poco comprendí que era necesario aprender estas herramientas, y sobretodo tener buenas prácticas en el desarrollo de software, tales como la estrategia de Branching que, aunque no la entendía al principio, supe que era algo necesario y hasta da gusto (y algo de pereza también... jeje) crear nuevas ramas y luego mergearlas a la rama develop, que en mi caso, fue donde mergeaba todo.
 Aprendí que el concepto de Fail-Fast no era solo una frase teórica, porque cuando un test falla en el controlador o el escáner detecta un problema de seguridad crítico, el pipeline protege el entorno productivo de forma autónoma. Muchas veces me quedé hasta tarde intentando solucionar un problema con el pipeline cuando la mayoria de veces era un problema de identación en los YML... o incluso un conflicto de versiones... y tuve que volver a poner "docker compose down" y "docker compose up" un montón de veces, pero en fin. Fue una experiencia compleja y todo esto es muy necesario para el desarrollo de software.
 
+Jeremy Pincheira: Durante el desarrollo de esta Evaluación Uno de los aprendizajes más relevantes fue comprender que un pipeline CI/CD no solo debe compilar y desplegar una aplicación, sino que también debe entregar información útil para tomar decisiones técnicas. En este cas
+
 
 
 
